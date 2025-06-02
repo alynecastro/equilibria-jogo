@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equilibria: Floresta Serena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Evita barras de rolagem durante transições */
+        }
+        .font-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .guardian-lumin-svg {
+            width: 100px;
+            height: 100px;
+            fill: currentColor; /* Cor será definida pela classe de texto do Tailwind */
+        }
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            transition: transform 4s ease-in-out, background-color 4s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .inspire {
+            transform: scale(1.5);
+            background-color: #A7F3D0; /* Verde claro para inspirar */
+        }
+        .expire {
+            transform: scale(0.8);
+            background-color: #BAE6FD; /* Azul claro para expirar */
+        }
+        .forest-bg {
+            background: linear-gradient(to bottom, #E0F2FE, #A5F3FC, #67E8F9); /* Céu azul claro a ciano */
+            position: relative;
+            overflow: hidden;
+        }
+        .fog {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(200, 200, 210, 0.7); /* Névoa acinzentada */
+            transition: opacity 2s ease-in-out;
+            pointer-events: none; /* Permite cliques através da névoa */
+            z-index: 5;
+        }
+        .tree {
+            position: absolute;
+            bottom: 0;
+            width: 80px; /* Tamanho base da árvore */
+            height: 160px; /* Tamanho base da árvore */
+            background-color: #38A169; /* Verde escuro para árvores */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Forma de triângulo para copa */
+            opacity: 0.7;
+        }
+        .tree-trunk {
+            position: absolute;
+            bottom: -20px; /* Ajuste para o tronco ficar abaixo da copa */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 40px;
+            background-color: #78350F; /* Marrom para tronco */
+        }
+
+        /* Esconde seções inicialmente */
+        .hidden-section {
+            display: none;
+        }
+        /* Animação de fade-in */
+        .fade-in {
+            animation: fadeInAnimation 1s ease-in forwards;
+        }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Botão estilizado */
+        .custom-button {
+            background-color: #38A169; /* Verde escuro */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .custom-button:hover {
+            background-color: #2F855A; /* Verde mais escuro no hover */
+            transform: translateY(-2px);
+        }
+        .custom-button:active {
+            transform: translateY(0px);
+        }
+        .gemini-button {
+            background-color: #4A90E2; /* Azul para o botão Gemini */
+        }
+        .gemini-button:hover {
+            background-color: #357ABD;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4A90E2;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto; /* Centraliza o spinner */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .tip-container {
+            background-color: #f0f9ff; /* Azul muito claro */
+            border: 1px solid #A5F3FC; /* Ciano claro */
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: left;
+            font-style: italic;
+            color: #075985; /* Azul escuro */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-emerald-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto bg-white/80 backdrop-blur-md shadow-2xl rounded-xl p-6 md:p-10">
+
+        <section id="start-screen" class="text-center space-y-6 fade-in">
+            <h1 class="text-4xl md:text-5xl font-title text-emerald-700">Equilibria</h1>
+            <h2 class="text-2xl md:text-3xl font-semibold text-emerald-600">A Floresta Serena</h2>
+            
+            <div class="flex justify-center my-4">
+                <svg class="guardian-lumin-svg text-emerald-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4ZM12 6C9.24 6 7 8.24 7 11C7 12.81 7.85 14.39 9.11 15.33L9.8 17.5H14.2L14.89 15.33C16.15 14.39 17 12.81 17 11C17 8.24 14.76 6 12 6ZM12 8C13.66 8 15 9.34 15 11C15 11.93 14.53 12.75 13.83 13.29L13.5 13.54V14.5H10.5V13.54L10.17 13.29C9.47 12.75 9 11.93 9 11C9 9.34 10.34 8 12 8Z"/>
+                </svg>
+            </div>
+            <p class="text-lg text-gray-700">Bem-vindo(a), buscador(a) da harmonia. Eu sou <strong class="text-emerald-600">Lumin</strong>, Guardião da Floresta Serena.</p>
+            <p class="text-md text-gray-600">Esta floresta reflete a calma da sua mente. Sinto uma névoa de inquietação a pairar por aqui. Juntos, podemos dissipá-la através da respiração consciente.</p>
+            <p class="text-md text-gray-600">Siga a luz e o ritmo. Inspire profundamente quando o círculo se expandir e expire suavemente quando ele se contrair. Complete <strong id="total-breaths-info">5</strong> ciclos para restaurar a clareza.</p>
+            <button id="start-button" class="custom-button">Iniciar Exercício</button>
+        </section>
+
+        <section id="game-screen" class="hidden-section text-center space-y-6">
+            <div id="forest-visualization" class="relative w-full h-64 md:h-80 rounded-lg forest-bg overflow-hidden border-2 border-emerald-300">
+                <div class="tree" style="left: 10%; width: 70px; height: 140px; opacity: 0.6;"><div class="tree-trunk"></div></div>
+                <div class="tree" style="left: 30%; width: 90px; height: 180px; opacity: 0.75;"><div class="tree-trunk" style="height:50px; width: 25px;"></div></div>
+                <div class="tree" style="left: 55%; width: 60px; height: 120px; opacity: 0.5;"><div class="tree-trunk" style="height:30px; width: 15px;"></div></div>
+                <div class="tree" style="left: 75%; width: 85px; height: 170px; opacity: 0.7;"><div class="tree-trunk"></div></div>
+                <div id="fog-overlay" class="fog"></div>
+            </div>
+
+            <p id="lumin-message" class="text-lg text-emerald-700 font-semibold">Concentre-se na sua respiração...</p>
+            
+            <div class="flex justify-center items-center my-6">
+                <div id="breathing-circle" class="breathing-circle bg-sky-300 text-gray-700 font-semibold p-2">
+                    <span id="breathing-instruction">Prepare-se...</span>
+                </div>
+            </div>
+            
+            <p class="text-md text-gray-600">Ciclos de respiração completados: <span id="breath-count" class="font-bold text-emerald-600">0</span>/<span id="total-breaths-game">5</span></p>
+            <button id="exit-early-button" class="custom-button bg-amber-500 hover:bg-amber-600">Sair do Exercício</button>
+        </section>
+
+        <section id="end-screen" class="hidden-section text-center space-y-6">
+            <h2 id="end-title" class="text-3xl md:text-4xl font-semibold text-emerald-600">Harmonia Restaurada!</h2>
+             <div class="flex justify-center my-4">
+                <svg class="guardian-lumin-svg text-emerald-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4ZM11.25 15.5L7.75 12L9.16 10.59L11.25 12.67L14.84 9.09L16.25 10.5L11.25 15.5Z"/>
+                </svg>
+            </div>
+            <p id="end-message" class="text-lg text-gray-700">A névoa dissipou-se, e a Floresta Serena brilha com clareza. Demonstrou grande foco.</p>
+            <p class="text-md text-gray-600">Lembre-se, a paz interior é uma prática constante. Retorne sempre que precisar reencontrar o seu centro.</p>
+            <div class="space-x-4 mt-4">
+                <button id="restart-button" class="custom-button">Praticar Novamente</button>
+                <button id="gemini-tip-button" class="custom-button gemini-button">✨ Receber Dica de Lumin</button>
+            </div>
+            <div id="gemini-tip-loading" class="loading-spinner hidden-section mt-4"></div>
+            <div id="gemini-tip-container" class="tip-container hidden-section">
+                <p id="gemini-tip-text"></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Elementos da UI
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+
+        const startButton = document.getElementById('start-button');
+        const exitEarlyButton = document.getElementById('exit-early-button');
+        const restartButton = document.getElementById('restart-button');
+        const geminiTipButton = document.getElementById('gemini-tip-button');
+
+        const breathingCircle = document.getElementById('breathing-circle');
+        const breathingInstruction = document.getElementById('breathing-instruction');
+        const breathCountDisplay = document.getElementById('breath-count');
+        const luminMessage = document.getElementById('lumin-message');
+        const fogOverlay = document.getElementById('fog-overlay');
+        
+        const totalBreathsInfo = document.getElementById('total-breaths-info');
+        const totalBreathsGame = document.getElementById('total-breaths-game');
+
+        const endTitle = document.getElementById('end-title');
+        const endMessage = document.getElementById('end-message');
+
+        const geminiTipContainer = document.getElementById('gemini-tip-container');
+        const geminiTipText = document.getElementById('gemini-tip-text');
+        const geminiTipLoading = document.getElementById('gemini-tip-loading');
+
+
+        // Configurações do jogo
+        const TOTAL_BREATHS_REQUIRED = 5;
+        const INHALE_DURATION = 4000; // 4 segundos
+        const EXHALE_DURATION = 4000; // 4 segundos
+        const HOLD_DURATION = 1000; // 1 segundo de pausa entre inspiração e expiração
+
+        let currentBreaths = 0;
+        let gameInterval;
+        let isGameRunning = false;
+
+        // Inicializa a informação de total de respirações
+        totalBreathsInfo.textContent = TOTAL_BREATHS_REQUIRED;
+        totalBreathsGame.textContent = TOTAL_BREATHS_REQUIRED;
+
+        // Função para mostrar uma secção e esconder as outras
+        function showSection(sectionToShow, fadeIn = true) {
+            [startScreen, gameScreen, endScreen, geminiTipContainer, geminiTipLoading].forEach(section => {
+                if (section.id === sectionToShow.id) {
+                    section.classList.remove('hidden-section');
+                    if (fadeIn) section.classList.add('fade-in');
+                } else {
+                    section.classList.add('hidden-section');
+                    if (fadeIn) section.classList.remove('fade-in');
+                }
+            });
+        }
+        
+        // Função para iniciar o exercício de respiração
+        function startBreathingExercise() {
+            isGameRunning = true;
+            currentBreaths = 0;
+            updateBreathCount();
+            showSection(gameScreen);
+            luminMessage.textContent = "Concentre-se na sua respiração...";
+            fogOverlay.style.opacity = 0.7; // Névoa inicial densa
+            geminiTipContainer.classList.add('hidden-section'); // Esconde a dica anterior
+            geminiTipText.textContent = '';
+            
+            // Pequeno atraso antes de iniciar o primeiro ciclo para o utilizador se preparar
+            breathingInstruction.textContent = "Prepare-se...";
+            breathingCircle.classList.remove('inspire', 'expire');
+
+            setTimeout(() => {
+                if (!isGameRunning) return; // Verifica se o jogo ainda está a correr
+                runBreathCycle();
+            }, 2000); // 2 segundos de preparação
+        }
+
+        // Função para executar um ciclo de respiração
+        function runBreathCycle() {
+            if (!isGameRunning || currentBreaths >= TOTAL_BREATHS_REQUIRED) {
+                endBreathingExercise(currentBreaths >= TOTAL_BREATHS_REQUIRED);
+                return;
+            }
+
+            // Inspirar
+            breathingInstruction.textContent = "Inspire...";
+            breathingCircle.classList.add('inspire');
+            breathingCircle.classList.remove('expire');
+            luminMessage.textContent = "Sinta o ar a preencher os seus pulmões.";
+
+            gameInterval = setTimeout(() => {
+                if (!isGameRunning) return;
+                // Segurar (opcional, mas bom para transição)
+                breathingInstruction.textContent = "Segure...";
+                // Não muda a classe aqui, mantém expandido
+
+                setTimeout(() => {
+                    if (!isGameRunning) return;
+                    // Expirar
+                    breathingInstruction.textContent = "Expire...";
+                    breathingCircle.classList.add('expire');
+                    breathingCircle.classList.remove('inspire');
+                    luminMessage.textContent = "Liberte o ar lentamente...";
+
+                    setTimeout(() => {
+                        if (!isGameRunning) return;
+                        currentBreaths++;
+                        updateBreathCount();
+                        
+                        // Reduz a opacidade da névoa gradualmente
+                        const fogOpacity = 0.7 - (0.6 * (currentBreaths / TOTAL_BREATHS_REQUIRED));
+                        fogOverlay.style.opacity = Math.max(0.1, fogOpacity); // Mínimo de 0.1 para ainda ser visível
+
+                        if (currentBreaths < TOTAL_BREATHS_REQUIRED) {
+                            runBreathCycle(); // Próximo ciclo
+                        } else {
+                            endBreathingExercise(true); // Completou todos os ciclos
+                        }
+                    }, EXHALE_DURATION);
+                }, HOLD_DURATION);
+            }, INHALE_DURATION);
+        }
+
+        // Função para atualizar a contagem de respirações
+        function updateBreathCount() {
+            breathCountDisplay.textContent = currentBreaths;
+        }
+
+        // Função para finalizar o exercício
+        function endBreathingExercise(completed) {
+            isGameRunning = false;
+            clearTimeout(gameInterval);
+            showSection(endScreen);
+            breathingCircle.classList.remove('inspire', 'expire');
+            breathingInstruction.textContent = "Concluído";
+
+            if (completed) {
+                endTitle.textContent = "Harmonia Restaurada!";
+                endMessage.textContent = "A névoa dissipou-se, e a Floresta Serena brilha com clareza. Demonstrou grande foco.";
+                fogOverlay.style.opacity = 0; // Remove completamente a névoa
+            } else {
+                endTitle.textContent = "Pausa na Jornada";
+                endMessage.textContent = "Interrompeu o exercício. Lembre-se, a prática leva à calma. Volte quando quiser.";
+                // Mantém a névoa no estado atual se saiu mais cedo
+            }
+        }
+
+        // Função para buscar dica de mindfulness da API Gemini
+        async function fetchMindfulnessTip() {
+            geminiTipLoading.classList.remove('hidden-section');
+            geminiTipContainer.classList.add('hidden-section');
+            geminiTipText.textContent = '';
+            geminiTipButton.disabled = true; // Desabilita o botão durante o carregamento
+
+            const prompt = "Gere uma curta dica de mindfulness (máximo 2 frases) ou um pensamento inspirador sobre calma e serenidade para um jogo chamado Equilibria. A dica deve ser reconfortante e encorajadora, como se viesse de um sábio guardião da floresta chamado Lumin. Use uma linguagem simples e poética. Não inclua saudações ou despedidas, apenas a dica em si.";
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Deixar vazio, será fornecido pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Erro da API Gemini:", errorData);
+                    throw new Error(`Erro da API: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    geminiTipText.textContent = `Lumin sussurra: "${text}"`;
+                } else {
+                    console.error("Resposta inesperada da API Gemini:", result);
+                    geminiTipText.textContent = "Lumin está a meditar profundamente... Tente novamente mais tarde.";
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dica da API Gemini:', error);
+                geminiTipText.textContent = "Houve um momento de desassossego na floresta. Por favor, tente novamente para receber a sabedoria de Lumin.";
+            } finally {
+                geminiTipLoading.classList.add('hidden-section');
+                geminiTipContainer.classList.remove('hidden-section');
+                geminiTipButton.disabled = false; // Reabilita o botão
+            }
+        }
+
+
+        // Event Listeners
+        startButton.addEventListener('click', startBreathingExercise);
+        
+        exitEarlyButton.addEventListener('click', () => {
+            if (isGameRunning) {
+                endBreathingExercise(false); // Indica que não completou
+            }
+        });
+
+        restartButton.addEventListener('click', () => {
+            showSection(startScreen); 
+            // Reseta a névoa para a próxima sessão, caso o utilizador não tenha completado
+            fogOverlay.style.opacity = 0.7;
+            geminiTipContainer.classList.add('hidden-section'); // Esconde a dica ao reiniciar
+            geminiTipText.textContent = '';
+        });
+
+        geminiTipButton.addEventListener('click', fetchMindfulnessTip);
+
+        // Mostrar ecrã inicial ao carregar
+        showSection(startScreen);
+
+    </script>
+</body>
+</html>
