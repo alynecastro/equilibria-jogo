@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Evita barras de rolagem durante transições */
+            overflow: hidden; 
         }
         .font-title {
             font-family: 'Playfair Display', serif;
@@ -17,7 +17,7 @@
         .guardian-lumin-svg {
             width: 100px;
             height: 100px;
-            fill: currentColor; /* Cor será definida pela classe de texto do Tailwind */
+            fill: currentColor; 
         }
         .breathing-circle {
             width: 150px;
@@ -31,14 +31,14 @@
         }
         .inspire {
             transform: scale(1.5);
-            background-color: #A7F3D0; /* Verde claro para inspirar */
+            background-color: #A7F3D0; 
         }
         .expire {
             transform: scale(0.8);
-            background-color: #BAE6FD; /* Azul claro para expirar */
+            background-color: #BAE6FD; 
         }
         .forest-bg {
-            background: linear-gradient(to bottom, #E0F2FE, #A5F3FC, #67E8F9); /* Céu azul claro a ciano */
+            background: linear-gradient(to bottom, #E0F2FE, #A5F3FC, #67E8F9); 
             position: relative;
             overflow: hidden;
         }
@@ -48,35 +48,32 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(200, 200, 210, 0.7); /* Névoa acinzentada */
+            background-color: rgba(200, 200, 210, 0.7); 
             transition: opacity 2s ease-in-out;
-            pointer-events: none; /* Permite cliques através da névoa */
+            pointer-events: none; 
             z-index: 5;
         }
         .tree {
             position: absolute;
             bottom: 0;
-            width: 80px; /* Tamanho base da árvore */
-            height: 160px; /* Tamanho base da árvore */
-            background-color: #38A169; /* Verde escuro para árvores */
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Forma de triângulo para copa */
+            width: 80px; 
+            height: 160px; 
+            background-color: #38A169; 
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); 
             opacity: 0.7;
         }
         .tree-trunk {
             position: absolute;
-            bottom: -20px; /* Ajuste para o tronco ficar abaixo da copa */
+            bottom: -20px; 
             left: 50%;
             transform: translateX(-50%);
             width: 20px;
             height: 40px;
-            background-color: #78350F; /* Marrom para tronco */
+            background-color: #78350F; 
         }
-
-        /* Esconde seções inicialmente */
         .hidden-section {
             display: none;
         }
-        /* Animação de fade-in */
         .fade-in {
             animation: fadeInAnimation 1s ease-in forwards;
         }
@@ -84,9 +81,8 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Botão estilizado */
         .custom-button {
-            background-color: #38A169; /* Verde escuro */
+            background-color: #38A169; 
             color: white;
             padding: 12px 24px;
             border-radius: 8px;
@@ -96,14 +92,14 @@
             cursor: pointer;
         }
         .custom-button:hover {
-            background-color: #2F855A; /* Verde mais escuro no hover */
+            background-color: #2F855A; 
             transform: translateY(-2px);
         }
         .custom-button:active {
             transform: translateY(0px);
         }
         .gemini-button {
-            background-color: #4A90E2; /* Azul para o botão Gemini */
+            background-color: #4A90E2; 
         }
         .gemini-button:hover {
             background-color: #357ABD;
@@ -115,20 +111,20 @@
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
-            margin: 0 auto; /* Centraliza o spinner */
+            margin: 0 auto; 
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         .tip-container {
-            background-color: #f0f9ff; /* Azul muito claro */
-            border: 1px solid #A5F3FC; /* Ciano claro */
+            background-color: #f0f9ff; 
+            border: 1px solid #A5F3FC; 
             border-radius: 8px;
             padding: 16px;
             margin-top: 20px;
             text-align: left;
             font-style: italic;
-            color: #075985; /* Azul escuro */
+            color: #075985; 
         }
     </style>
 </head>
@@ -183,7 +179,7 @@
             <p class="text-md text-gray-600">Lembre-se, a paz interior é uma prática constante. Retorne sempre que precisar reencontrar o seu centro.</p>
             <div class="space-x-4 mt-4">
                 <button id="restart-button" class="custom-button">Praticar Novamente</button>
-                <button id="gemini-tip-button" class="custom-button gemini-button">✨ Receber Dica de Lumin</button>
+                <button id="gemini-tip-button" class="custom-button gemini-button">✨ Dica de Lumin</button>
             </div>
             <div id="gemini-tip-loading" class="loading-spinner hidden-section mt-4"></div>
             <div id="gemini-tip-container" class="tip-container hidden-section">
@@ -222,19 +218,31 @@
 
         // Configurações do jogo
         const TOTAL_BREATHS_REQUIRED = 5;
-        const INHALE_DURATION = 4000; // 4 segundos
-        const EXHALE_DURATION = 4000; // 4 segundos
-        const HOLD_DURATION = 1000; // 1 segundo de pausa entre inspiração e expiração
+        const INHALE_DURATION = 4000; 
+        const EXHALE_DURATION = 4000; 
+        const HOLD_DURATION = 1000; 
 
         let currentBreaths = 0;
         let gameInterval;
         let isGameRunning = false;
 
-        // Inicializa a informação de total de respirações
         totalBreathsInfo.textContent = TOTAL_BREATHS_REQUIRED;
         totalBreathsGame.textContent = TOTAL_BREATHS_REQUIRED;
 
-        // Função para mostrar uma secção e esconder as outras
+        // Lista de dicas estáticas de Lumin
+        const staticLuminTips = [
+            "A cada respiração, encontre um momento de paz. A calma reside em si.",
+            "Observe os seus pensamentos como nuvens no céu, passageiros e leves.",
+            "Ancore-se no presente. O aqui e agora é o seu refúgio seguro.",
+            "A gentileza consigo mesmo é o primeiro passo para a serenidade interior.",
+            "Mesmo nos dias mais agitados, reserve um instante para respirar e recentrar."
+        ];
+
+        function getRandomLuminTip() {
+            const randomIndex = Math.floor(Math.random() * staticLuminTips.length);
+            return staticLuminTips[randomIndex];
+        }
+
         function showSection(sectionToShow, fadeIn = true) {
             [startScreen, gameScreen, endScreen, geminiTipContainer, geminiTipLoading].forEach(section => {
                 if (section.id === sectionToShow.id) {
@@ -247,35 +255,31 @@
             });
         }
         
-        // Função para iniciar o exercício de respiração
         function startBreathingExercise() {
             isGameRunning = true;
             currentBreaths = 0;
             updateBreathCount();
             showSection(gameScreen);
             luminMessage.textContent = "Concentre-se na sua respiração...";
-            fogOverlay.style.opacity = 0.7; // Névoa inicial densa
-            geminiTipContainer.classList.add('hidden-section'); // Esconde a dica anterior
+            fogOverlay.style.opacity = 0.7; 
+            geminiTipContainer.classList.add('hidden-section'); 
             geminiTipText.textContent = '';
             
-            // Pequeno atraso antes de iniciar o primeiro ciclo para o utilizador se preparar
             breathingInstruction.textContent = "Prepare-se...";
             breathingCircle.classList.remove('inspire', 'expire');
 
             setTimeout(() => {
-                if (!isGameRunning) return; // Verifica se o jogo ainda está a correr
+                if (!isGameRunning) return; 
                 runBreathCycle();
-            }, 2000); // 2 segundos de preparação
+            }, 2000); 
         }
 
-        // Função para executar um ciclo de respiração
         function runBreathCycle() {
             if (!isGameRunning || currentBreaths >= TOTAL_BREATHS_REQUIRED) {
                 endBreathingExercise(currentBreaths >= TOTAL_BREATHS_REQUIRED);
                 return;
             }
 
-            // Inspirar
             breathingInstruction.textContent = "Inspire...";
             breathingCircle.classList.add('inspire');
             breathingCircle.classList.remove('expire');
@@ -283,13 +287,10 @@
 
             gameInterval = setTimeout(() => {
                 if (!isGameRunning) return;
-                // Segurar (opcional, mas bom para transição)
                 breathingInstruction.textContent = "Segure...";
-                // Não muda a classe aqui, mantém expandido
 
                 setTimeout(() => {
                     if (!isGameRunning) return;
-                    // Expirar
                     breathingInstruction.textContent = "Expire...";
                     breathingCircle.classList.add('expire');
                     breathingCircle.classList.remove('inspire');
@@ -300,26 +301,23 @@
                         currentBreaths++;
                         updateBreathCount();
                         
-                        // Reduz a opacidade da névoa gradualmente
                         const fogOpacity = 0.7 - (0.6 * (currentBreaths / TOTAL_BREATHS_REQUIRED));
-                        fogOverlay.style.opacity = Math.max(0.1, fogOpacity); // Mínimo de 0.1 para ainda ser visível
+                        fogOverlay.style.opacity = Math.max(0.1, fogOpacity); 
 
                         if (currentBreaths < TOTAL_BREATHS_REQUIRED) {
-                            runBreathCycle(); // Próximo ciclo
+                            runBreathCycle(); 
                         } else {
-                            endBreathingExercise(true); // Completou todos os ciclos
+                            endBreathingExercise(true); 
                         }
                     }, EXHALE_DURATION);
                 }, HOLD_DURATION);
             }, INHALE_DURATION);
         }
 
-        // Função para atualizar a contagem de respirações
         function updateBreathCount() {
             breathCountDisplay.textContent = currentBreaths;
         }
 
-        // Função para finalizar o exercício
         function endBreathingExercise(completed) {
             isGameRunning = false;
             clearTimeout(gameInterval);
@@ -330,30 +328,34 @@
             if (completed) {
                 endTitle.textContent = "Harmonia Restaurada!";
                 endMessage.textContent = "A névoa dissipou-se, e a Floresta Serena brilha com clareza. Demonstrou grande foco.";
-                fogOverlay.style.opacity = 0; // Remove completamente a névoa
+                fogOverlay.style.opacity = 0; 
             } else {
                 endTitle.textContent = "Pausa na Jornada";
                 endMessage.textContent = "Interrompeu o exercício. Lembre-se, a prática leva à calma. Volte quando quiser.";
-                // Mantém a névoa no estado atual se saiu mais cedo
             }
         }
 
-        // Função para buscar dica de mindfulness da API Gemini
         async function fetchMindfulnessTip() {
             geminiTipLoading.classList.remove('hidden-section');
             geminiTipContainer.classList.add('hidden-section');
             geminiTipText.textContent = '';
-            geminiTipButton.disabled = true; // Desabilita o botão durante o carregamento
+            geminiTipButton.disabled = true; 
 
-            const prompt = "Gere uma curta dica de mindfulness (máximo 2 frases) ou um pensamento inspirador sobre calma e serenidade para um jogo chamado Equilibria. A dica deve ser reconfortante e encorajadora, como se viesse de um sábio guardião da floresta chamado Lumin. Use uma linguagem simples e poética. Não inclua saudações ou despedidas, apenas a dica em si.";
-            
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // Deixar vazio, será fornecido pelo ambiente
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            await new Promise(resolve => setTimeout(resolve, 500)); // Simula delay
 
             try {
+                const apiKey = ""; // Chave API intencionalmente vazia
+                if (!apiKey && (typeof process === 'undefined' || !process.env || !process.env.GEMINI_API_KEY)) {
+                    throw new Error("Chave API não disponível. Usando dica estática.");
+                }
+                
+                // Este código SÓ seria executado se uma chave API fosse fornecida.
+                const prompt = "Gere uma curta dica de mindfulness (máximo 2 frases) ou um pensamento inspirador sobre calma e serenidade para um jogo chamado Equilibria. A dica deve ser reconfortante e encorajadora, como se viesse de um sábio guardião da floresta chamado Lumin. Use uma linguagem simples e poética. Não inclua saudações ou despedidas, apenas a dica em si.";
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -362,10 +364,9 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    console.error("Erro da API Gemini:", errorData);
-                    throw new Error(`Erro da API: ${response.statusText}`);
+                    console.error("Erro da API Gemini (Lumin):", errorData);
+                    throw new Error(`Erro da API: ${response.statusText}. Usando dica estática.`);
                 }
-
                 const result = await response.json();
 
                 if (result.candidates && result.candidates.length > 0 &&
@@ -374,42 +375,34 @@
                     const text = result.candidates[0].content.parts[0].text;
                     geminiTipText.textContent = `Lumin sussurra: "${text}"`;
                 } else {
-                    console.error("Resposta inesperada da API Gemini:", result);
-                    geminiTipText.textContent = "Lumin está a meditar profundamente... Tente novamente mais tarde.";
+                    throw new Error("Resposta inesperada da API. Usando dica estática.");
                 }
             } catch (error) {
-                console.error('Erro ao buscar dica da API Gemini:', error);
-                geminiTipText.textContent = "Houve um momento de desassossego na floresta. Por favor, tente novamente para receber a sabedoria de Lumin.";
+                console.warn('Erro ao buscar dica da API Gemini (Lumin) ou chave não disponível:', error.message);
+                const staticTip = getRandomLuminTip();
+                geminiTipText.textContent = `Lumin sussurra: "${staticTip}"`;
             } finally {
                 geminiTipLoading.classList.add('hidden-section');
                 geminiTipContainer.classList.remove('hidden-section');
-                geminiTipButton.disabled = false; // Reabilita o botão
+                geminiTipButton.disabled = false; 
             }
         }
 
-
-        // Event Listeners
         startButton.addEventListener('click', startBreathingExercise);
-        
         exitEarlyButton.addEventListener('click', () => {
             if (isGameRunning) {
-                endBreathingExercise(false); // Indica que não completou
+                endBreathingExercise(false); 
             }
         });
-
         restartButton.addEventListener('click', () => {
             showSection(startScreen); 
-            // Reseta a névoa para a próxima sessão, caso o utilizador não tenha completado
             fogOverlay.style.opacity = 0.7;
-            geminiTipContainer.classList.add('hidden-section'); // Esconde a dica ao reiniciar
+            geminiTipContainer.classList.add('hidden-section'); 
             geminiTipText.textContent = '';
         });
-
         geminiTipButton.addEventListener('click', fetchMindfulnessTip);
 
-        // Mostrar ecrã inicial ao carregar
         showSection(startScreen);
-
     </script>
 </body>
 </html>
