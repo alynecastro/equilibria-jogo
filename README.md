@@ -1,2 +1,2 @@
 # equilibria-jogo
-Mini-jogo de mindfulness criado com base no projeto Equilibria.
+Mini-jogo de mindfulness para restaurar a calma.
